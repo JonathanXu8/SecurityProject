@@ -24,7 +24,7 @@ public class SecretSigns {
         byte[] innerKeyByteArray = Arrays.copyOfRange(decryptedText, 0, 32); // 256 bit key =  32 bytes
         SecretKey innerKey = new SecretKeySpec(innerKeyByteArray, 0, innerKeyByteArray.length, "AES");
 
-        decryptedText = Arrays.copyOfRange(decryptedText, 32 + decryptedText[32] + 128, decryptedText.length);
+        decryptedText = Arrays.copyOfRange(decryptedText, 32 + decryptedText[32] + 128, decryptedText.length);//32 + decryptedText[32] + 128 makes it remove the padding + 128 is because bytes start at -128
 
         decryptedText = Cryptography.decrypt(decryptedText, innerKey, iv);
 
@@ -33,14 +33,14 @@ public class SecretSigns {
     }
 
     public static byte[] generatePadding(){
-        byte length = (byte) (Math.random() * (256) - 128);
+        byte length = (byte) (Math.random() * 256 - 128);
 
         byte[] padding = new byte[length + 128];
 
         padding[0] = length;
 
         for(int i = 1; i < length + 128; i++){
-            padding[i] = (byte) (Math.random() * (128 + 128) - 128);
+            padding[i] = (byte) (Math.random() * 256 - 128);
         }
 
         return padding;
