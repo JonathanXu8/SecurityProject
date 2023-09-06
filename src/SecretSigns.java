@@ -1,7 +1,6 @@
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class SecretSigns {
@@ -20,7 +19,7 @@ public class SecretSigns {
     public static String decrypt(byte[] cypherText, SecretKey key, IvParameterSpec iv) throws Exception {
         byte[] decryptedText = Cryptography.decrypt(cypherText, key, iv);
 
-        byte[] innerKeyByteArray = Arrays.copyOfRange(decryptedText, 0, 32);
+        byte[] innerKeyByteArray = Arrays.copyOfRange(decryptedText, 0, 32); // 256 bit key =  32 bytes
         SecretKey innerKey = new SecretKeySpec(innerKeyByteArray, 0, innerKeyByteArray.length, "AES");
 
         decryptedText = Arrays.copyOfRange(decryptedText, 32, decryptedText.length);
