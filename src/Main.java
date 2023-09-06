@@ -28,6 +28,7 @@ public class Main {
                 System.out.print(cypherText[j] + " ");
             }
             System.out.println();
+            System.out.println("Cypher Text Length: " + cypherText.length);
 
             String decryptedText = SecretSigns.decrypt(cypherText, key, iv);
 
