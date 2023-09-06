@@ -1,53 +1,49 @@
-import javafx.util.Pair;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class SecretSigns {
 
-    public static Pair sendAndEncrypt(String s, SecretKey key, IvParameterSpec iv) throws Exception{
-        String multiKey = generateMutiKey(128);
+    public static byte[] encrypt(String text, SecretKey key, IvParameterSpec iv) throws Exception {
+        SecretKey innerKey = Cryptography.generateKey();
 
-        byte[] cypherText = Cryptography.encrypt(s + multiKey, key, iv);
-        byte[] encryptedKey = Cryptography.encrypt(multiKey, key, iv);
+        byte[] cypherText = join(innerKey.getEncoded(), Cryptography.encrypt(text, innerKey, iv));
 
-        return new Pair(cypherText, encryptedKey);
+        cypherText =   Cryptography.encrypt(cypherText, key, iv);
 
-    }
-
-    public static String recieveAndDecrpt(Pair pair, SecretKey key, IvParameterSpec iv ) throws Exception{
-        byte[] cypherText = (byte[]) pair.getKey();
-        byte[] encryptedKey = (byte[]) pair.getValue();
-
-        String multiKey = Cryptography.decrypt(encryptedKey, key, iv);
-        int bytes = multiKey.length();
-
-        String s = Cryptography.decrypt(cypherText, key, iv);
-        s = s.substring(0, s.length() - bytes);
-
-        return s;
+        return cypherText;
 
     }
 
+    public static String decrypt(byte[] cypherText, SecretKey key, IvParameterSpec iv) throws Exception {
+        byte[] decryptedText = Cryptography.decrypt(cypherText, key, iv);
 
-    public static String generateMutiKey(int bytes){
+        byte[] innerKeyByteArray = Arrays.copyOfRange(decryptedText, 0, 32);
+        SecretKey innerKey = new SecretKeySpec(innerKeyByteArray, 0, innerKeyByteArray.length, "AES");
 
-        String key = "";
+        decryptedText = Arrays.copyOfRange(decryptedText, 32, decryptedText.length);
 
-        for(int i = 0; i < bytes; i++){
-            int temp = (int) (Math.random() * (127 - 33) + 33);
-            key += (char) temp;
+        decryptedText = Cryptography.decrypt(decryptedText, innerKey, iv);
+
+        return new String(decryptedText);
+
+    }
+
+    public static byte[] join(byte[] arr1, byte[] arr2){
+        byte[] temp = new byte[arr1.length + arr2.length];
+
+        for(int i = 0; i < temp.length; i++){
+            if(i < arr1.length){
+                temp[i] = arr1[i];
+            } else {
+                temp[i] = arr2[i - arr1.length];
+            }
         }
 
-        return key;
+        return temp;
     }
-
-
-
-
-
-
-
-
 
 
 }

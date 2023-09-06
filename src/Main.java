@@ -1,47 +1,40 @@
-import javafx.util.Pair;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Scanner;
 
 public class Main {
-
     public static void main(String[] args) throws Exception {
 
-        SecretKey symmetricKey = Cryptography.generateKey();
+        SecretKey key = Cryptography.generateKey();
+
+        byte[] tempKey = key.getEncoded();
+
+        key = new SecretKeySpec(tempKey, 0, tempKey.length, "AES");
+
         IvParameterSpec iv = Cryptography.generateIv();
 
-        // Takes input from the keyboard
         Scanner message = new Scanner(System.in);
         String plainText = message.nextLine();
-        message.close();
 
-        /*
-        // Encrypt the message using the symmetric key
-        Pair cipherText = SecretSigns.sendAndEncrypt(plainText, symmetricKey, iv);
+        for(int i = 0; i < 100; i++) {
 
-        System.out.println("The encrypted message is: " + cipherText.getKey().toString());
+            System.out.println("Plain Text: " + plainText);
 
-        // Decrypt the encrypted message
-        String decryptedText = SecretSigns.recieveAndDecrpt(cipherText, symmetricKey, iv);
+            byte[] cypherText = SecretSigns.encrypt(plainText, key, iv);
 
-        System.out.println( "Your original message is: " + decryptedText);
-
-        System.out.println();
-        */
-
-        for(int i = 0; i < 100; i++){
-            Pair encryptedPackage = SecretSigns.sendAndEncrypt(plainText, symmetricKey, iv);
-            System.out.println("The encrypted message is: " + encryptedPackage.getKey().toString());
-            String decryptedText = SecretSigns.recieveAndDecrpt(encryptedPackage, symmetricKey, iv);
-            System.out.println( "Your original message is: " + decryptedText);
-
+            System.out.print("Cypher Text: ");
+            for(int j = 0; j < cypherText.length; j++){
+                System.out.print(cypherText[j] + " ");
+            }
             System.out.println();
 
+            String decryptedText = SecretSigns.decrypt(cypherText, key, iv);
+
+            System.out.println("Decrypted Text: " + decryptedText);
+
+            System.out.println();
         }
-
-
-
 
     }
 

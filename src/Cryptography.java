@@ -11,7 +11,7 @@ public class Cryptography {
 
     public static SecretKey generateKey() throws NoSuchAlgorithmException {
         KeyGenerator keygenerator = KeyGenerator.getInstance("AES");
-        keygenerator.init(128);
+        keygenerator.init(256);
         return keygenerator.generateKey();
     }
 
@@ -22,18 +22,25 @@ public class Cryptography {
         return new IvParameterSpec(initializationVector);
     }
 
-    public static byte[] encrypt(String input, SecretKey key, IvParameterSpec iv)
-            throws Exception {
+    public static byte[] encrypt(String input, SecretKey key, IvParameterSpec iv) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, key, iv);
         return cipher.doFinal(input.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String decrypt(byte[] cipherText, SecretKey key, IvParameterSpec iv) throws Exception {
+    public static byte[] encrypt(byte[] input, SecretKey key, IvParameterSpec iv) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+        return cipher.doFinal(input);
+    }
+
+
+
+    public static byte[] decrypt(byte[] cipherText, SecretKey key, IvParameterSpec iv) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
         byte[] plainText = cipher.doFinal(cipherText);
-        return new String(plainText);
+        return plainText;
     }
 
 }
